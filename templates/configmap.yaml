@@ -1,5 +1,6 @@
 {{- range $container := .Values.containers }}
 {{- if $container.enableConfigMap }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
