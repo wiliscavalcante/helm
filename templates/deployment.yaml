@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deployment
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+        {{- range $container := .Values.containers }}
+        - name: {{ $container.name }}
+          image: {{ $container.image }}:{{ $container.tag }}
+          imagePullPolicy: {{ $container.imagePullPolicy }}
+          ports:
+            - containerPort: {{ $container.port }}
+              protocol: {{ $container.protocol }}
+          resources:
+{{ toYaml $.Values.resources | indent 12 }}
+{{- if $container.enableConfigMap }}
+          envFrom:
+            - configMapRef:
+                name: {{ $.Release.Name }}-{{ $container.name }}-configmap
+{{- end }}
+{{- if $.Values.createPVC }}
+{{- if $container.mountPath }}
+          volumeMounts:
+            - name: {{ $.Release.Name }}-pvc
+              mountPath: {{ $container.mountPath }}
+{{- end }}
+{{- end }}
+        {{- end }}
+      volumes:
+{{- if $.Values.createPVC }}
+      - name: {{ $.Release.Name }}-pvc
+        persistentVolumeClaim:
+          claimName: {{ $.Release.Name }}-pvc
+{{- end }}
+      {{- if $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- range .Values.imagePullSecrets }}
+        - name: {{ .name }}
+        {{- end }}
+      {{- end }}
