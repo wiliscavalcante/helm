@@ -1,0 +1,47 @@
+replicaCount: 1
+
+containers:
+  - name: nginx-container
+    image: nginx
+    tag: latest
+    imagePullPolicy: Always
+    port: 80
+    protocol: TCP
+    mountPath: /data
+    enableConfigMap: false
+    configMapData:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    enableSecret: false
+
+  - name: postgres-container
+    image: postgres
+    tag: 9.4
+    imagePullPolicy: IfNotPresent
+    port: 5432
+    protocol: TCP
+    mountPath: /data
+    enableConfigMap: true
+    configMapData:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+createPVC: true
+pvc:
+  storageClassName: do-block-storage
+  accessMode: ReadWriteOnce
+  storageSize: 5Gi
+
+createService: true
+serviceType: ClusterIP
+resources: {}
+  # limits:
+  #   cpu: 500m
+  #   memory: 1Gi
+  # requests:
+  #   cpu: 200m
+  #   memory: 500Mi
+imagePullSecrets: []
+  # - name: my-image-pull-secret
