@@ -1,0 +1,26 @@
+# templates/service.yaml
+
+{{- if .Values.createService }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-service
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  selector:
+    app: {{ .Release.Name }}
+  ports:
+{{- range $container := .Values.containers }}
+    - name: {{ $container.name }}
+      port: {{ $container.port }}
+      targetPort: {{ $container.port }}
+      protocol: {{ $container.protocol }}
+{{- end }}
+{{- if .Values.serviceType }}
+  type: {{ .Values.serviceType }}
+{{- end }}
+
+{{- end }}
+

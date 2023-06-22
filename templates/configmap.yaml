@@ -1,0 +1,12 @@
+{{- range $container := .Values.containers }}
+{{- if $container.enableConfigMap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Release.Name }}-{{ $container.name }}-configmap
+data:
+{{- range $key, $value := $container.configMapData }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
