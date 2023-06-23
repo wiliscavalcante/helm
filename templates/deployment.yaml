@@ -13,37 +13,47 @@ spec:
         app: {{ .Release.Name }}
     spec:
       containers:
-{{- range $container := .Values.containers }}
+      {{- range $container := .Values.containers }}
       - name: {{ $container.name }}
         image: {{ $container.image }}:{{ $container.tag }}
         imagePullPolicy: {{ $container.imagePullPolicy }}
         ports:
-        - containerPort: {{ $container.port }}
-          protocol: {{ $container.protocol }}
+          - containerPort: {{ $container.port }}
+            protocol: {{ $container.protocol }}
         resources:
-{{ toYaml $.Values.resources | indent 10 }}
-{{- if $container.enableConfigMap }}
+{{ toYaml $.Values.resources | indent 12 }}
+        {{- if and $container.enableConfigMap $container.enableSecret }}
         envFrom:
-        - configMapRef:
-            name: {{ $.Release.Name }}-{{ $container.name }}-configmap
-{{- end }}
+          - configMapRef:
+              name: {{ $.Release.Name }}-{{ $container.name }}-configmap
+          - secretRef:
+              name: {{ $.Release.Name }}-{{ $container.name }}-secret
+        {{- else if $container.enableConfigMap }}
+        envFrom:
+          - configMapRef:
+              name: {{ $.Release.Name }}-{{ $container.name }}-configmap
+        {{- else if $container.enableSecret }}
+        envFrom:
+          - secretRef:
+              name: {{ $.Release.Name }}-{{ $container.name }}-secret
+        {{- end }}
 {{- if $.Values.createPVC }}
-{{- if $container.mountPath }}
+        {{- if $container.mountPath }}
         volumeMounts:
-        - name: {{ $.Release.Name }}-pvc
-          mountPath: {{ $container.mountPath }}
+          - name: {{ $.Release.Name }}-pvc
+            mountPath: {{ $container.mountPath }}
+        {{- end }}
 {{- end }}
-{{- end }}
-{{- end }}
+      {{- end }}
       volumes:
 {{- if $.Values.createPVC }}
-      - name: {{ $.Release.Name }}-pvc
-        persistentVolumeClaim:
-          claimName: {{ $.Release.Name }}-pvc
+        - name: {{ $.Release.Name }}-pvc
+          persistentVolumeClaim:
+            claimName: {{ $.Release.Name }}-pvc
 {{- end }}
-{{- if $.Values.imagePullSecrets }}
+      {{- if $.Values.imagePullSecrets }}
       imagePullSecrets:
-{{- range .Values.imagePullSecrets }}
-      - name: {{ .name }}
-{{- end }}
-{{- end }}
+      {{- range .Values.imagePullSecrets }}
+        - name: {{ .name }}
+      {{- end }}
+      {{- end }}
