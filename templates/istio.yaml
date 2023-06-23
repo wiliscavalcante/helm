@@ -1,39 +1,38 @@
-{{- if .Values.istio.enableIstio }}
-apiVersion: networking.istio.io/v1beta1
-kind: Gateway
-metadata:
-  name: {{ .Release.Name }}-gateway
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-  - port:
-      number: 80
-      name: http
-      protocol: HTTP
-    hosts:
-    {{- range .Values.istio.hosts }}
-    - "{{ . }}"
-    {{- end }}
----
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: {{ .Release.Name }}-virtualservice
+  name: 
 spec:
-  hosts:
-  {{- range .Values.istio.hosts }}
-  - "{{ . }}"
-  {{- end }}
   gateways:
-  - {{ .Release.Name }}-gateway
+  - some-gateway
+  hosts:
+  - some.exemplo.com
   http:
-  - route:
+  - headers:
+      request:
+        set:
+          X-Forwarded-Proto: https
+    match:
+    - uri:
+        prefix: /
+    name: some-route
+    route:
     - destination:
-        host: {{ .Release.Name }}-service
+        host: some-service
         port:
-          number: 8080
-    {{- if ne .Values.istio.prefix "" }}
-      prefix: {{ .Values.istio.prefix }}
-    {{- end }}
-{{- end }}
+          number: 80
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: some-gateway
+spec:
+  selector:
+    istio: ingress
+  servers:
+  - hosts:
+    - some.exemplo.com
+    port:
+      name: http
+      number: 443
+      protocol: HTTP
