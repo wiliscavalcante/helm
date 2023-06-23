@@ -8,12 +8,16 @@ containers:
     port: 80
     protocol: TCP
     mountPath: /data
-    enableConfigMap: false
+    enableConfigMap: true
     configMapData:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_HOST_AUTH_METHOD: trust
-    enableSecret: false
+    enableSecret: true
+    secretData:
+      POSTGRES_USER: cG9zdGdyZXM=
+      POSTGRES_PASSWORD: cG9zdGdyZXM=
+      POSTGRES_HOST_AUTH_METHOD: dHJ1c3Q=
 
   - name: postgres-container
     image: postgres
@@ -27,14 +31,18 @@ containers:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_HOST_AUTH_METHOD: trust
+    enableSecret: true
+    secretData:
+      MY_USERNAME: bmVvNGo=  # Base64-encoded value: "neo4j"
+      MY_PASSWORD: cGFzc3dvcmQ=  # Base64-encoded value: "password"
 
-createPVC: true
+createPVC: false
 pvc:
   storageClassName: do-block-storage
   accessMode: ReadWriteOnce
   storageSize: 5Gi
 
-createService: true
+createService: false
 serviceType: ClusterIP
 resources: {}
   # limits:
