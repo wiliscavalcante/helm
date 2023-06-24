@@ -55,6 +55,5 @@ imagePullSecrets: []
   # - name: my-image-pull-secret
 enableIngress: true
 virtualServiceHost: some.exemplo.com
-serviceName: some-service
-servicePort: 80
+virtualServicePrefix: /
 
