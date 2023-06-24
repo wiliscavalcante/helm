@@ -30,11 +30,13 @@ spec:
           X-Forwarded-Proto: https
     match:
     - uri:
-        prefix: /
-    name: some-route
+        prefix: {{ .Values.virtualServicePrefix }}
+    name: {{ .Release.Name }}-route
     route:
     - destination:
-        host: {{ .Values.serviceName }}
+        host: {{ .Release.Name }}-service
         port:
-          number: {{ .Values.servicePort }}
+{{- range $container := .Values.containers }}
+          number: {{ $container.port }}
+{{- end }}
 {{- end }}
