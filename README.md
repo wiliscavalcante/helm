@@ -63,7 +63,3 @@ Se você encontrar algum problema ou tiver alguma sugestão de melhoria, sinta-s
 ## Licença
 
 Este projeto está licenciado sob a [MIT License](LICENSE).
-
-Esse é apenas um exemplo básico de um README para um chart do Helm. Você pode personalizá-lo de acordo com as necessidades do seu projeto, adicionando informações adicionais, instruções de configuração avançada, exemplos de uso e qualquer outra coisa relevante para o seu chart.
-
-Lembre-se de atualizar o conteúdo do README com informações precisas e relevantes para garantir que os usuários do seu chart possam entender e utilizar corretamente o seu aplicativo.
