@@ -8,6 +8,6 @@ entries:
     digest: 98e7918e4b905ce20075b64b7728999d907ce3d3eb88c1f71223e1bedd0fea18
     name: my-chart
     urls:
-    - my-chart-1.0.0.tgz
+    - https://wiliscavalcante.github.io/helm/my-chart-1.0.0.tgz
     version: 1.0.0
 generated: "2023-06-24T21:58:08.469765428-03:00"
