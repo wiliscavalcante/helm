@@ -12,6 +12,7 @@ spec:
       labels:
         app: {{ .Release.Name }}
     spec:
+      serviceAccountName: {{ .Values.serviceAccount }}
       containers:
       {{- range $container := .Values.containers }}
       - name: {{ $container.name }}
