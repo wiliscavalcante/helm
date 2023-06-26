@@ -1,4 +1,3 @@
-Certamente! Aqui está um exemplo de um README básico que você pode usar para o seu chart:
 
 # Meu Chart
 
