@@ -37,3 +37,4 @@ spec:
         host: {{ .Release.Name }}-service
         port:
           number: {{ if ne .Values.virtualServicePort nil }}{{ .Values.virtualServicePort }}{{ else }}{{ index .Values.containers 0 "port" }}{{ end }}
+{{- end }}
