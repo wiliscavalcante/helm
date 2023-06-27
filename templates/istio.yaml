@@ -36,7 +36,4 @@ spec:
     - destination:
         host: {{ .Release.Name }}-service
         port:
-{{- range $container := .Values.containers }}
-          number: {{ $container.port }}
-{{- end }}
-{{- end }}
+          number: {{ if ne .Values.virtualServicePort nil }}{{ .Values.virtualServicePort }}{{ else }}{{ index .Values.containers 0 "port" }}{{ end }}
