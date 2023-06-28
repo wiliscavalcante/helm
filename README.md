@@ -1,64 +1,55 @@
 
-# Meu Chart
+# Generic App Helm Chart
 
-Este é o chart do Helm para o Meu Aplicativo.
-
-## Descrição
-
-O Meu Aplicativo é uma aplicação web incrível que faz coisas incríveis. Este chart permite implantar facilmente o Meu Aplicativo em um cluster Kubernetes usando o Helm.
+Este é um Helm chart para implantar uma aplicação genérica stateless ou stateful.
 
 ## Pré-requisitos
 
-- Kubernetes 1.10+
-- Helm 3.0+
+- Cluster Kubernetes
+- Helm (versão 3.x) instalado
 
 ## Instalação
 
-Para instalar o Meu Aplicativo no seu cluster Kubernetes, siga as instruções abaixo.
+1. Adicione o repositório do Helm chart:
 
-Adicione o repositório do chart:
-```
-helm repo add meu-repo https://exemplo.com/meu-repo
+```bash
+helm repo add my-repo <repo-url>
 helm repo update
 ```
 
-Instale o chart:
+Substitua `<repo-url>` pela URL do seu repositório do Helm.
+
+2. Instale o chart:
+
+```bash
+helm install my-app my-repo/generic-app
 ```
-helm install meu-app meu-repo/meu-chart
+
+Este comando irá instalar o chart com o nome de release "my-app".
+
+## Desinstalação
+
+Para desinstalar o chart, execute o seguinte comando:
+
+```bash
+helm uninstall my-app
 ```
 
 ## Configuração
 
-A tabela a seguir descreve os parâmetros de configuração disponíveis para o chart.
+Você pode configurar os valores do chart através de um arquivo YAML. Durante a instalação, utilize a opção `--values` para fornecer o arquivo de configuração.
 
-| Parâmetro                  | Descrição                              | Valor Padrão |
-|----------------------------|----------------------------------------|--------------|
-| `image.repository`         | Repositório da imagem do container      | `meu-app`    |
-| `image.tag`                | Tag da imagem do container              | `latest`     |
-| `replicaCount`             | Número de réplicas                      | `1`          |
-| `service.type`             | Tipo de serviço                         | `ClusterIP`  |
-| `service.port`             | Porta do serviço                        | `80`         |
-| `resources.limits.cpu`     | Limite de CPU para o container          | `500m`       |
-| `resources.limits.memory`  | Limite de memória para o container      | `1Gi`        |
-| `resources.requests.cpu`   | Requisição de CPU para o container      | `200m`       |
-| `resources.requests.memory`| Requisição de memória para o container  | `500Mi`      |
+Para obter mais informações sobre as opções de configuração, consulte o arquivo `values.yaml`.
 
-Para personalizar a instalação do chart, você pode especificar os valores desejados usando a opção `--set` no comando `helm install`, ou fornecer um arquivo de valores personalizados usando a opção `-f`:
-```
-helm install meu-app meu-repo/meu-chart --set service.type=NodePort
-```
+## Suporte e Contribuição
 
-## Desinstalação
-
-Para desinstalar o Meu Aplicativo do seu cluster Kubernetes, execute o seguinte comando:
-```
-helm uninstall meu-app
-```
-
-## Contribuição
-
-Se você encontrar algum problema ou tiver alguma sugestão de melhoria, sinta-se à vontade para abrir uma issue ou enviar um pull request.
+- Para suporte, consulte a documentação do Helm: [https://helm.sh/docs/](https://helm.sh/docs/)
+- Para relatar problemas ou solicitar recursos, abra uma issue no repositório do chart: [link-para-repo-do-chart](link-para-repo-do-chart)
+- Contribuições são bem-vindas! Sinta-se à vontade para enviar pull requests.
 
 ## Licença
 
-Este projeto está licenciado sob a [MIT License](LICENSE).
+Este projeto está licenciado sob a [Nome da Licença]. Leia o arquivo `LICENSE` para obter mais informações.
+```
+
+Por favor, substitua `<repo-url>` pelo URL real do seu repositório do Helm e adicione o nome correto da licença no último parágrafo.
