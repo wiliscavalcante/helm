@@ -1,59 +1,84 @@
+######################################################
+#                                                    #
+#     CHART PARA APLICAÇÕES STATELESS E STATEFUL     #
+#                                                    #
+######################################################
+
+# Este é um chart genérico para auxiliar no deploy de aplicações stateless e stateful.
+# Você pode personalizar os valores deste arquivo para atender às necessidades da sua aplicação.
+
+# Define o número de réplicas do deployment
 replicaCount: 1
 
+# Define o service account a ser usado para o deployment
+# Se a aplicação não precisar de service account, comente a linha ou omita essa informação.
+serviceAccount: default
+
+# Lista os containers que serão executados no deployment
+# Para adicionar mais containers, copie este bloco de configuração e atualize os valores
+
+# Configurações do contêiner
 containers:
-  - name: nginx-container
-    image: nginx
-    tag: latest
-    imagePullPolicy: Always
-    port: 80
-    protocol: TCP
-    mountPath: /data
-    enableConfigMap: true
-    configMapData:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
-    enableSecret: true
-    secretData:
-      POSTGRES_USER: cG9zdGdyZXM=
-      POSTGRES_PASSWORD: cG9zdGdyZXM=
-      POSTGRES_HOST_AUTH_METHOD: dHJ1c3Q=
+  - name: nginx-container  # Nome do contêiner
+    image: nginx  # Imagem do contêiner
+    tag: latest  # Tag da imagem
+    imagePullPolicy: Always  # Política de obtenção da imagem (Always, IfNotPresent, Never)
+    port: 80  # Porta exposta pelo contêiner
+    protocol: TCP  # Protocolo da porta (TCP, UDP)
+    mountPath: /data  # Caminho de montagem para volumes
+    enableConfigMap: false  # Habilitar ou desabilitar o uso de ConfigMap para as variáveis de ambiente
+    configMapData:  # Dados do ConfigMap (chave-valor) para o contêiner
+      MY_CONFIG: value1  # Exemplo de chave-valor para o ConfigMap
+      ANOTHER_CONFIG: value2  # Outro exemplo de chave-valor para o ConfigMap
+    enableSecret: false  # Habilitar ou desabilitar o uso de Secret para as variáveis de ambiente
+    secretData:  # Dados do Secret (chave-valor) para o contêiner
+      MY_SECRET: c2VjcmV0MTIzNDU2  # Exemplo de chave-valor para o Secret (valor codificado em base64)
+      ANOTHER_SECRET: cGFzc3dvcmQxMjM0NTY=  # Outro exemplo de chave-valor para o Secret (valor codificado em base64)
 
-  - name: postgres-container
-    image: postgres
-    tag: 9.4
-    imagePullPolicy: IfNotPresent
-    port: 5432
-    protocol: TCP
-    mountPath: /data
-    enableConfigMap: true
-    configMapData:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
-    enableSecret: true
-    secretData:
-      MY_USERNAME: bmVvNGo=  # Base64-encoded value: "neo4j"
-      MY_PASSWORD: cGFzc3dvcmQ=  # Base64-encoded value: "password"
 
+# Define se um PersistentVolumeClaim (PVC) será criado para o deployment
 createPVC: false
+
+# Configurações do PersistentVolumeClaim, caso createPVC seja definido como true
 pvc:
-  storageClassName: do-block-storage
+  # O valor padrão definido no chart para storageClassName é gp2. Caso você esteja usando opções de StorageClass diferentes ou deseja especificar um StorageClass diferente para o PersistentVolumeClaim (PVC), você pode alterar esse valor para o StorageClass desejado.
+  storageClassName: gp2
+  # O valor padrão para `accessMode` é `ReadWriteOnce`. Outros valores possíveis são `ReadOnlyMany` e `ReadWriteMany`.
   accessMode: ReadWriteOnce
   storageSize: 5Gi
 
+# Define se um Service será criado para expor o deployment, se definido como true, o service será criado.
 createService: false
+
+# O valor padrão para `serviceType` é `ClusterIP`. Outros tipos possíveis incluem `NodePort`, `LoadBalancer` e `ExternalName`.
 serviceType: ClusterIP
-resources: {}
+
+# Recursos (CPU e memória) a serem alocados para o deployment
+resources:
   # limits:
   #   cpu: 500m
   #   memory: 1Gi
   # requests:
   #   cpu: 200m
   #   memory: 500Mi
-imagePullSecrets: []
-  # - name: my-image-pull-secret
-enableIngress: true
-virtualServiceHost: some.exemplo.com
-virtualServicePrefix: /
 
+
+# Segredos para acesso a repositórios de imagens privados
+imagePullSecrets: []
+
+# Exemplo de uso: descomente e especifique o nome do segredo
+# imagePullSecrets: 
+#   - name: my-image-pull-secret  
+
+
+# Define se um Ingress será criado para o deployment
+enableIngress: false
+
+# O hostname associado ao Ingress
+virtualServiceHost: example.com
+
+# O prefixo do caminho para o roteamento do Ingress
+virtualServicePrefix: /app
+
+# O número da porta do serviço no Ingress (deixe como null para usar a porta do container)
+virtualServicePort: null
