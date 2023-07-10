@@ -1,10 +1,11 @@
-{{- range $container := .Values.containers }}
-{{- if $container.enableConfigMap }}
+{{- $releaseName := .Release.Name -}}
+{{- range $index, $container := .Values.containers }}
+{{- if and $container.enableConfigMap (or (eq $index 0) (gt (len $.Values.containers) 1)) }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ $.Release.Name }}-{{ $container.name }}-configmap
+  name: {{ if eq (len $.Values.containers) 1 }}{{ $releaseName }}-configmap{{ else }}{{ $releaseName }}-{{ $container.name }}-configmap{{ end }}
 data:
 {{- range $key, $value := $container.configMapData }}
   {{ $key }}: {{ $value | quote }}
