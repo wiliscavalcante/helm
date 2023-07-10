@@ -7,6 +7,13 @@ spec:
   selector:
     matchLabels:
       app: {{ .Release.Name }}
+  strategy:
+    type: {{ .Values.deploymentStrategyType }}
+    {{- if .Values.deploymentStrategyType }}
+    rollingUpdate:
+      maxSurge: {{ .Values.deploymentMaxSurge }}
+      maxUnavailable: {{ .Values.deploymentMaxUnavailable }}
+    {{- end }}
   template:
     metadata:
       labels:
@@ -14,7 +21,7 @@ spec:
     spec:
       serviceAccountName: {{ .Values.serviceAccount }}
       containers:
-      {{- range $container := .Values.containers }}
+      {{- range $index, $container := .Values.containers }}
       - name: {{ $container.name }}
         image: {{ $container.image }}:{{ $container.tag }}
         imagePullPolicy: {{ $container.imagePullPolicy }}
@@ -26,32 +33,62 @@ spec:
         {{- if and $container.enableConfigMap $container.enableSecret }}
         envFrom:
           - configMapRef:
-              name: {{ $.Release.Name }}-{{ $container.name }}-configmap
+              name: {{ if eq (len $.Values.containers) 1 }}{{ $.Release.Name }}-configmap{{ else }}{{ $.Release.Name }}-{{ $container.name }}-configmap{{ end }}
           - secretRef:
-              name: {{ $.Release.Name }}-{{ $container.name }}-secret
+              name: {{ if eq (len $.Values.containers) 1 }}{{ $.Release.Name }}-secret{{ else }}{{ $.Release.Name }}-{{ $container.name }}-secret{{ end }}
         {{- else if $container.enableConfigMap }}
         envFrom:
           - configMapRef:
-              name: {{ $.Release.Name }}-{{ $container.name }}-configmap
+              name: {{ if eq (len $.Values.containers) 1 }}{{ $.Release.Name }}-configmap{{ else }}{{ $.Release.Name }}-{{ $container.name }}-configmap{{ end }}
         {{- else if $container.enableSecret }}
         envFrom:
           - secretRef:
-              name: {{ $.Release.Name }}-{{ $container.name }}-secret
+              name: {{ if eq (len $.Values.containers) 1 }}{{ $.Release.Name }}-secret{{ else }}{{ $.Release.Name }}-{{ $container.name }}-secret{{ end }}
         {{- end }}
-{{- if $.Values.createPVC }}
-        {{- if $container.mountPath }}
+{{- if or $container.enablePVC $container.enableEmptyDir }}
         volumeMounts:
-          - name: {{ $.Release.Name }}-pvc
-            mountPath: {{ $container.mountPath }}
-        {{- end }}
+{{- if $container.enablePVC }}
+        - name: {{ $.Release.Name }}-pvc
+          mountPath: {{ $container.mountPath }}
+{{- end }}
+{{- if $container.enableEmptyDir }}
+        - name: {{ $.Release.Name }}-emptydir
+          mountPath: {{ $container.emptyDirMountPath }}
+{{- end }}
 {{- end }}
       {{- end }}
       volumes:
-{{- if $.Values.createPVC }}
+{{- if and $.Values.createPVC $.Values.createEmptyDir }}
         - name: {{ $.Release.Name }}-pvc
           persistentVolumeClaim:
             claimName: {{ $.Release.Name }}-pvc
+        - name: {{ $.Release.Name }}-emptydir
+          emptyDir: {}
+{{- else if $.Values.createPVC }}
+        - name: {{ $.Release.Name }}-pvc
+          persistentVolumeClaim:
+            claimName: {{ $.Release.Name }}-pvc
+{{- else if $.Values.createEmptyDir }}
+        - name: {{ $.Release.Name }}-emptydir
+          emptyDir: {}
 {{- end }}
+      {{- if eq (len $.Values.containers) 1 }}
+        - name: {{ $.Release.Name }}-configmap
+          configMap:
+            name: {{ $.Release.Name }}-configmap
+        - name: {{ $.Release.Name }}-secret
+          secret:
+            secretName: {{ $.Release.Name }}-secret
+      {{- else if gt (len $.Values.containers) 1 }}
+        {{- range $container := $.Values.containers }}
+        - name: {{ $.Release.Name }}-{{ $container.name }}-configmap
+          configMap:
+            name: {{ $.Release.Name }}-{{ $container.name }}-configmap
+        - name: {{ $.Release.Name }}-{{ $container.name }}-secret
+          secret:
+            secretName: {{ $.Release.Name }}-{{ $container.name }}-secret
+        {{- end }}
+      {{- end }}
       {{- if $.Values.imagePullSecrets }}
       imagePullSecrets:
       {{- range .Values.imagePullSecrets }}
