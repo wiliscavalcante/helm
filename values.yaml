@@ -146,6 +146,11 @@ containers:
     mountPath: /app/data
     enableEmptyDir: true
     emptyDirMountPath: /app/cache
+# Adicionando as labels obrigatórias
+labels:
+  CostString: "CostCode-123"
+  AppID: "AppID-123"
+  Environment: "Production"
 
 
 
