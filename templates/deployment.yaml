@@ -18,6 +18,9 @@ spec:
     metadata:
       labels:
         app: {{ .Release.Name }}
+        CostString: {{ .Values.labels.CostString }}
+        AppID: {{ .Values.labels.AppID }}
+        Environment: {{ .Values.labels.Environment }}
     spec:
       serviceAccountName: {{ .Values.serviceAccount }}
       containers:
